@@ -20,7 +20,13 @@ session=Session(bind=engine)
 
 
 @auth_router.get("/")
-async def hello():
+async def refresh_token(Authorize: AuthJWT = Depends()):
+    try:
+        Authorize.jwt_refresh_token_required()
+    except Exception as e:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+
     return {"message": "Hello, Auth!"}
 
 
@@ -92,7 +98,19 @@ async def login(user: loginModel, Authorize: AuthJWT = Depends()):
 
 
 
+#refresh token route
+@auth_router.get("/refresh", status_code=status.HTTP_200_OK)
+async def refresh_token(Authorize: AuthJWT = Depends()):
+    try:
+        Authorize.jwt_refresh_token_required()
+    except Exception as e:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
+    current_user = Authorize.get_jwt_subject()
+    access_token = Authorize.create_access_token(subject=current_user)
+    response = {"access_token": access_token}
+
+    return jsonable_encoder(response)
 
 
 

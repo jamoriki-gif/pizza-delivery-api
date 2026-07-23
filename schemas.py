@@ -61,5 +61,14 @@ class OrderModel(BaseModel):
             }
         }
 
+    class order_status_model(BaseModel):
+        order_status: Optional[str] = "pending"
+        class Config:
+            schema_extra = {
+                "example": {
+                    "order_status": "pending"
+                }
+            }
+       
 
 
